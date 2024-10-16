@@ -1,32 +1,28 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
+import { InvoiceService } from '../service/InvoiceService';
 
 @Component({
   selector: 'app-receipt-search',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, HttpClientModule], // Include HttpClientModule here
   templateUrl: './receipt-search.component.html',
-  styleUrl: './receipt-search.component.scss'
+  styleUrls: ['./receipt-search.component.scss'],
+  providers:[InvoiceService]
 })
 export class ReceiptSearchComponent implements OnInit {
 
   searchForm!: FormGroup;
-
+  filteredData: any[] = [];
   stores = [
     { id: 1, name: 'Store 1' },
     { id: 2, name: 'Store 2' },
     { id: 3, name: 'Store 3' }
   ];
 
-  mockData = [
-    { receiptNo: 'R100', store: 1, date: '2023-10-12', amount: 500, status: 'Pending' },
-    { receiptNo: 'R200', store: 2, date: '2023-09-10', amount: 1000, status: 'Completed' },
-  ];
-
-  filteredData: any[] = [];
-
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private invoiceService: InvoiceService) {}
 
   ngOnInit(): void {
     const today = new Date().toISOString().split('T')[0];
@@ -38,12 +34,7 @@ export class ReceiptSearchComponent implements OnInit {
       toDate: [today, Validators.required]
     });
 
-    this.searchForm.get('receiptNo')?.valueChanges.subscribe((value) => {
-      if (value) {
-        this.filterMockData(value);
-      }
-    });
-
+    this.searchForm.get('receiptNo')?.valueChanges.subscribe(() => this.validateDateRange());
     this.searchForm.get('fromDate')?.valueChanges.subscribe(() => this.validateDateRange());
     this.searchForm.get('toDate')?.valueChanges.subscribe(() => this.validateDateRange());
   }
@@ -57,23 +48,21 @@ export class ReceiptSearchComponent implements OnInit {
     }
   }
 
-  filterMockData(receiptNo: string): void {
-    const storeId = this.searchForm.get('storeId')?.value;
-    this.filteredData = this.mockData.filter(data =>
-      data.receiptNo.toLowerCase().includes(receiptNo.toLowerCase()) && 
-      data.store === storeId);
-  }
-
-  onRefresh() {
+  onRefresh(): void {
     if (this.searchForm.valid) {
-      console.log(this.searchForm.value);
-      this.filterMockData(this.searchForm.get('receiptNo')?.value);
+      const { receiptNo, storeId, fromDate, toDate } = this.searchForm.value;
+      this.invoiceService.getInvoices(receiptNo, storeId, fromDate, toDate).subscribe(
+        (data) => {
+          this.filteredData = data;
+        },
+        (error) => {
+          console.error('Error fetching invoices', error);
+        }
+      );
     }
   }
 
-  onClear() {
+  onClear(): void {
     this.searchForm.reset();
   }
-
-
 }

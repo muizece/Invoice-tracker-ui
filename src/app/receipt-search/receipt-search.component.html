@@ -44,20 +44,18 @@
     <thead>
       <tr>
         <th>Receipt No.</th>
-        <th>Date</th>
-        <th>Store</th>
-        <th>Amount</th>
-        <th>Status</th>
+        <th>Total Amount</th>
+        <th>Invoice date</th>
+        <th>Mobile Number</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let record of filteredData">
         <td>{{ record.receiptNo }}</td>
-        <td>{{ record.date }}</td>
-        <td>{{ record.store }}</td>
-        <td>{{ record.amount }}</td>
-        <td>{{ record.status }}</td>
+        <td>{{ record.totalAmount }}</td>
+        <td>{{ record.invoiceDate }}</td>
+        <td>{{ record.mobileNumber }}</td>
         <td>
           <button class="btn btn-sm btn-primary me-2">
             <i class="bi bi-eye"></i> View
@@ -72,3 +70,5 @@
 
   <p *ngIf="filteredData.length === 0" class="text-danger">No records found.</p>
 </div>
+
+
