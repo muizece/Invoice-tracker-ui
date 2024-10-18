@@ -6,29 +6,36 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http'; 
+import { HttpClientModule } from '@angular/common/http';
 import { InvoiceService } from '../service/InvoiceService';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-receipt-search',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule], 
+  imports: [ReactiveFormsModule, CommonModule, HttpClientModule],
   templateUrl: './receipt-search.component.html',
   styleUrls: ['./receipt-search.component.scss'],
   providers: [InvoiceService],
 })
 export class ReceiptSearchComponent implements OnInit {
+  hasSearched = false;
   searchForm!: FormGroup;
   invoiceForm: FormGroup;
   currentInvoiceId!: number;
   showPassport = false;
   showQid = false;
   filteredData: any[] = [];
+  paginatedData: any[] = [];
+  currentPage = 1;
+  itemsPerPage = 5;
+  totalPages = 0;
+  totalPagesArray: number[] = [];
+  message: string = '';
   stores = [
-    { id: 1, name: 'Store 1' },
-    { id: 2, name: 'Store 2' },
-    { id: 3, name: 'Store 3' },
+    { id: 1, name: '118 - WOQOD PETROL STATION DUKHAN' },
+    { id: 2, name: '119 - WOQOD AIR GAS STATION' },
+    { id: 3, name: '120 - WOQOD DIESEL STATION' },
   ];
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
@@ -58,9 +65,6 @@ export class ReceiptSearchComponent implements OnInit {
     });
 
     this.searchForm
-      .get('receiptNo')
-      ?.valueChanges.subscribe(() => this.validateDateRange());
-    this.searchForm
       .get('fromDate')
       ?.valueChanges.subscribe(() => this.validateDateRange());
     this.searchForm
@@ -73,30 +77,46 @@ export class ReceiptSearchComponent implements OnInit {
     const toDate = this.searchForm.get('toDate')?.value;
 
     if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-      this.searchForm.get('toDate')?.setErrors({ invalidDate: true });
+      this.searchForm.get('toDate')?.setErrors({ invalidRange: true });
+    } else {
+      this.searchForm.get('toDate')?.setErrors(null);
     }
   }
-
   onRefresh(): void {
     if (this.searchForm.valid) {
-      const { receiptNo, storeId, fromDate, toDate } = this.searchForm.value;
-      this.invoiceService
-        .getInvoices(receiptNo, storeId, fromDate, toDate)
-        .subscribe(
-          (data) => {
+      const formData = this.searchForm.value;
+
+      this.invoiceService.getInvoiceDetails(formData).subscribe(
+        (data) => {
+          if (data.message && data.data.length === 0) {
+            this.filteredData = [];
+            this.hasSearched = true;
+            this.message = data.message;
+          } else {
             this.filteredData = data;
-          },
-          (error) => {
-            console.error('Error fetching invoices', error);
+            this.hasSearched = true;
+            this.calculateTotalPages();
+            this.paginateData();
+            this.message = '';
           }
-        );
+        },
+        (error) => {
+          console.error('Error fetching invoices', error);
+        }
+      );
+    } else {
+      alert('Enter Store id and reciept no');
     }
   }
 
-  onClear(): void {
+  onClear() {
     this.searchForm.reset();
+    this.filteredData = [];
+    this.hasSearched = false;
+    this.paginatedData = [];
+    this.totalPages = 0;
+    this.totalPagesArray = [];
   }
-
 
   openModal(id: number) {
     this.currentInvoiceId = id;
@@ -106,10 +126,10 @@ export class ReceiptSearchComponent implements OnInit {
         id: invoice.id,
         storeName: invoice.storeName,
         receiptNo: invoice.receiptNo,
-        totalAmount: invoice.totalAmount, 
+        totalAmount: invoice.totalAmount,
         invoiceDate: invoice.invoiceDate,
         mobileNumber: invoice.mobileNumber || '',
-        proofOfIdentity: invoice.proofOfIdentity || 'passport', 
+        proofOfIdentity: invoice.proofOfIdentity || 'passport',
         email: invoice.email || '',
         customerName: invoice.customerName || '',
         qid: invoice.qid || '',
@@ -127,15 +147,14 @@ export class ReceiptSearchComponent implements OnInit {
     });
   }
 
-  onProofOfIdentityChange() {
-    const proofOfIdentity = this.invoiceForm.controls['proofOfIdentity'].value;
-
+  onProofOfIdentityChange(): void {
+    const proofOfIdentity = this.invoiceForm.get('proofOfIdentity')?.value;
     this.showPassport = proofOfIdentity === 'passport';
     this.showQid = proofOfIdentity === 'qid';
 
     if (this.showPassport) {
       if (this.invoiceForm.controls['passport'].value) {
-        this.invoiceForm.controls['passport'].disable(); 
+        this.invoiceForm.controls['passport'].disable();
       } else {
         this.invoiceForm.controls['passport'].enable();
       }
@@ -152,20 +171,20 @@ export class ReceiptSearchComponent implements OnInit {
 
   setFieldState(fieldName: string, value: any) {
     if (value) {
-      this.invoiceForm.controls[fieldName].disable(); 
+      this.invoiceForm.controls[fieldName].disable();
     } else {
-      this.invoiceForm.controls[fieldName].enable(); 
+      this.invoiceForm.controls[fieldName].enable();
     }
   }
 
   updateInvoice() {
-    const formValues = this.invoiceForm.getRawValue(); 
+    const formValues = this.invoiceForm.getRawValue();
     const updatedInvoice = {
-      id: this.currentInvoiceId || 0, 
-      storeName: '', 
-      receiptNo: 0, 
-      totalAmount: 0, 
-      invoiceDate: new Date().toISOString(), 
+      id: this.currentInvoiceId || 0,
+      storeName: '',
+      receiptNo: 0,
+      totalAmount: 0,
+      invoiceDate: new Date().toISOString(),
       mobileNumber:
         formValues.mobileNumber !== '' ? formValues.mobileNumber : 0,
       passport: formValues.passport || '',
@@ -173,19 +192,49 @@ export class ReceiptSearchComponent implements OnInit {
       customerName: formValues.customerName || '',
       qid: formValues.qid !== '' ? formValues.qid : 0,
     };
+    this.invoiceService
+      .updateInvoice(this.currentInvoiceId, updatedInvoice)
+      .subscribe(
+        (response) => {
+          console.log('Invoice updated successfully', response);
+          this.modalService.dismissAll();
+          this.onRefresh();
+        },
+        (error) => {
+          console.error('Error updating invoice', error);
+        }
+      );
+  }
 
-    console.log('Payload to be sent:', updatedInvoice);
-    const invoiceId = this.currentInvoiceId; 
+  calculateTotalPages(): void {
+    this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+    this.totalPagesArray = Array(this.totalPages)
+      .fill(0)
+      .map((x, i) => i + 1);
+  }
 
-    
-    this.invoiceService.updateInvoice(invoiceId, updatedInvoice).subscribe(
-      (response) => {
-        console.log('Invoice updated successfully', response);
-        this.modalService.dismissAll(); 
-      },
-      (error) => {
-        console.error('Error updating invoice', error);
-      }
-    );
+  paginateData(): void {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedData = this.filteredData.slice(startIndex, endIndex);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.paginateData();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.paginateData();
+    }
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.paginateData();
   }
 }

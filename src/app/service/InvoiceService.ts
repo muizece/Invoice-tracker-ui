@@ -10,17 +10,15 @@ export class InvoiceService {
 
   constructor(private http: HttpClient) {}
 
-  getInvoices(
-    receiptNo: number,
-    storeId: number,
-    fromDate: string,
-    toDate: string
-  ): Observable<any> {
+  
+  getInvoiceDetails(searchParams: any): Observable<any> {
     let params = new HttpParams()
-      .set('receiptNo', receiptNo.toString())
-      .set('storeId', storeId.toString())
-      .set('fromDate', fromDate)
-      .set('toDate', toDate);
+      .set('receiptNo', searchParams.receiptNo ? searchParams.receiptNo.toString() : '')
+      .set('storeId', searchParams.storeId ? searchParams.storeId.toString() : '')
+      .set('fromDate', searchParams.fromDate || '')
+      .set('toDate', searchParams.toDate || '')
+      .set('pageNumber', searchParams.pageNumber ? searchParams.pageNumber.toString() : '1') 
+      .set('pageSize', searchParams.pageSize ? searchParams.pageSize.toString() : '100'); 
 
     return this.http.get(this.apiUrl, { params });
   }
