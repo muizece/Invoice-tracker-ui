@@ -1,0 +1,54 @@
+<div class="modal-header">
+    <h5 class="modal-title">Update Invoice</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="close.emit()"></button>
+</div>
+
+<div class="modal-body">
+    <form [formGroup]="invoiceForm">
+        <!-- Customer Name -->
+        <div class="mb-3">
+            <label for="customerName" class="form-label">Customer Name</label>
+            <input type="text" id="customerName" class="form-control" formControlName="customerName" />
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" formControlName="email" />
+        </div>
+
+        <!-- Mobile -->
+        <div class="mb-3">
+            <label for="mobileNumber" class="form-label">Mobile Number</label>
+            <input type="tel" id="mobileNumber" class="form-control" formControlName="mobileNumber" />
+        </div>
+
+        <!-- Proof of Identity -->
+        <div class="mb-3">
+            <label for="proofOfIdentity" class="form-label">Proof of Identity</label>
+            <select id="proofOfIdentity" class="form-select" formControlName="proofOfIdentity"
+                (change)="onProofOfIdentityChange.emit()">
+                <option value="passport">Passport</option>
+                <option value="qid">QID</option>
+            </select>
+        </div>
+
+        <!-- Conditional Fields -->
+        <div *ngIf="showPassport" class="mb-3">
+            <label for="passport" class="form-label">Passport</label>
+            <input type="text" id="passport" class="form-control" formControlName="passport"
+                [disabled]="!showPassport" />
+        </div>
+
+        <div *ngIf="showQid" class="mb-3">
+            <label for="qid" class="form-label">QID</label>
+            <input type="number" id="qid" class="form-control" formControlName="qid" [disabled]="!showQid" />
+        </div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="close.emit()">Close</button>
+    <button type="button" class="btn btn-primary" [disabled]="!invoiceForm.valid"
+        (click)="updateInvoice.emit()">Update</button>
+</div>

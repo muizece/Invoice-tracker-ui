@@ -9,11 +9,14 @@ import {
 import { HttpClientModule } from '@angular/common/http';
 import { InvoiceService } from '../service/InvoiceService';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { SearchFormComponent } from './search-form/search-form.component';
+import { InvoiceTableComponent } from './invoice-table/invoice-table.component';
+import { InvoiceModalComponent } from './invoice-modal/invoice-modal.component';
 
 @Component({
   selector: 'app-receipt-search',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule],
+  imports: [ReactiveFormsModule, CommonModule, HttpClientModule, SearchFormComponent, InvoiceTableComponent, InvoiceModalComponent],
   templateUrl: './receipt-search.component.html',
   styleUrls: ['./receipt-search.component.scss'],
   providers: [InvoiceService],
@@ -21,7 +24,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class ReceiptSearchComponent implements OnInit {
   hasSearched = false;
   searchForm!: FormGroup;
-  invoiceForm: FormGroup;
+  invoiceForm!: FormGroup;
   currentInvoiceId!: number;
   showPassport = false;
   showQid = false;
@@ -32,11 +35,6 @@ export class ReceiptSearchComponent implements OnInit {
   totalPages = 0;
   totalPagesArray: number[] = [];
   message: string = '';
-  stores = [
-    { id: 1, name: '118 - WOQOD PETROL STATION DUKHAN' },
-    { id: 2, name: '119 - WOQOD AIR GAS STATION' },
-    { id: 3, name: '120 - WOQOD DIESEL STATION' },
-  ];
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
   constructor(
@@ -113,10 +111,16 @@ export class ReceiptSearchComponent implements OnInit {
     this.searchForm.reset();
     this.filteredData = [];
     this.hasSearched = false;
+    this.message='';
     this.paginatedData = [];
     this.totalPages = 0;
     this.totalPagesArray = [];
   }
+
+  onCloseModal() {
+    this.modalService.dismissAll();
+  }
+  
 
   openModal(id: number) {
     this.currentInvoiceId = id;
