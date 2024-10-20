@@ -5,8 +5,14 @@ import { routes } from './app.routes';
 import { provideToastr } from 'ngx-toastr';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes),
-    provideToastr()
-  ]
-
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideToastr({
+      positionClass: 'toast-top-center',
+      closeButton: true,
+      timeOut: 3000,
+      preventDuplicates:true,
+    }),
+  ],
 };

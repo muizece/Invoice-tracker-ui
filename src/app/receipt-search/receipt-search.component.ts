@@ -78,12 +78,13 @@ export class ReceiptSearchComponent implements OnInit {
     const toDate = this.searchForm.get('toDate')?.value;
 
     if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-      this.searchForm.get('toDate')?.setErrors({ invalidRange: true });
-    } else {
-      this.searchForm.get('toDate')?.setErrors(null);
-    }
+      this.toastr.error('From Date cannot be later than To Date.', 'Invalid Date Range');
+} else {
+    this.searchForm.get('toDate')?.setErrors(null);  
+}
   }
   onRefresh(): void {
+    this.validateDateRange();
     if (this.searchForm.valid) {
       const formData = this.searchForm.value;
 
@@ -107,7 +108,13 @@ export class ReceiptSearchComponent implements OnInit {
         }
       );
     } else {
-      alert('Enter Store id and reciept no');
+      if (!this.searchForm.get('storeId')?.value) {
+        this.toastr.warning('Please select a Store ID.', 'Missing Input');
+    }
+
+    if (!this.searchForm.get('receiptNo')?.value) {
+        this.toastr.warning('Please enter a Receipt Number.', 'Missing Input');
+    }
     }
   }
 
@@ -206,7 +213,7 @@ export class ReceiptSearchComponent implements OnInit {
       .pipe(
         tap((response) => {
           console.log('Invoice updated successfully', response);
-          this.toastr.success('Invoice updated successfully!','Success',{closeButton:true,positionClass:'toast-top-center'}); 
+          this.toastr.success('Invoice updated successfully!','Success'); 
           this.modalService.dismissAll();
           this.onRefresh();
         }),
