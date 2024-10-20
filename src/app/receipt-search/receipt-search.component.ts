@@ -7,11 +7,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { InvoiceService } from '../service/InvoiceService';
+import { InvoiceService } from '../services/InvoiceService';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchFormComponent } from './search-form/search-form.component';
 import { InvoiceTableComponent } from './invoice-table/invoice-table.component';
 import { InvoiceModalComponent } from './invoice-modal/invoice-modal.component';
+import { catchError, of, tap } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-receipt-search',
@@ -40,6 +42,7 @@ export class ReceiptSearchComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private invoiceService: InvoiceService,
+    private toastr: ToastrService,
     private modalService: NgbModal
   ) {
     this.invoiceForm = this.fb.group({
@@ -90,6 +93,7 @@ export class ReceiptSearchComponent implements OnInit {
             this.filteredData = [];
             this.hasSearched = true;
             this.message = data.message;
+            this.paginatedData = [];
           } else {
             this.filteredData = data;
             this.hasSearched = true;
@@ -153,23 +157,23 @@ export class ReceiptSearchComponent implements OnInit {
 
   onProofOfIdentityChange(): void {
     const proofOfIdentity = this.invoiceForm.get('proofOfIdentity')?.value;
-    this.showPassport = proofOfIdentity === 'passport';
-    this.showQid = proofOfIdentity === 'qid';
-
-    if (this.showPassport) {
-      if (this.invoiceForm.controls['passport'].value) {
-        this.invoiceForm.controls['passport'].disable();
-      } else {
-        this.invoiceForm.controls['passport'].enable();
-      }
-      this.invoiceForm.controls['qid'].disable();
-    } else if (this.showQid) {
-      if (this.invoiceForm.controls['qid'].value) {
-        this.invoiceForm.controls['qid'].disable();
-      } else {
-        this.invoiceForm.controls['qid'].enable();
-      }
-      this.invoiceForm.controls['passport'].disable();
+    
+    const isPassport = proofOfIdentity === 'passport';
+    const isQid = proofOfIdentity === 'qid';
+    
+    this.showPassport = isPassport;
+    this.showQid = isQid;
+  
+    this.toggleFormControl('passport', isPassport);
+    this.toggleFormControl('qid', isQid);
+  }
+  
+  private toggleFormControl(controlName: string, condition: boolean): void {
+    const control = this.invoiceForm.controls[controlName];
+    if (condition && !control.value) {
+      control.enable();
+    } else {
+      control.disable();
     }
   }
 
@@ -196,19 +200,25 @@ export class ReceiptSearchComponent implements OnInit {
       customerName: formValues.customerName || '',
       qid: formValues.qid !== '' ? formValues.qid : 0,
     };
+ 
     this.invoiceService
       .updateInvoice(this.currentInvoiceId, updatedInvoice)
-      .subscribe(
-        (response) => {
+      .pipe(
+        tap((response) => {
           console.log('Invoice updated successfully', response);
+          this.toastr.success('Invoice updated successfully!','Success',{closeButton:true,positionClass:'toast-top-center'}); 
           this.modalService.dismissAll();
           this.onRefresh();
-        },
-        (error) => {
+        }),
+        catchError((error) => {
           console.error('Error updating invoice', error);
-        }
-      );
+          this.toastr.error('Failed to update invoice. Please try again.'); 
+          return of(null); 
+        })
+      )
+      .subscribe(); 
   }
+
 
   calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
@@ -242,3 +252,4 @@ export class ReceiptSearchComponent implements OnInit {
     this.paginateData();
   }
 }
+

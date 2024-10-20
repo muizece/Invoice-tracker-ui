@@ -1,11 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AppComponent', () => {
+  
+  let toastrService: ToastrService;
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [AppComponent,
+        ReactiveFormsModule,
+        HttpClientTestingModule, 
+        ToastrModule.forRoot(),],
     }).compileComponents();
+    toastrService = TestBed.inject(ToastrService);
   });
 
   it('should create the app', () => {
@@ -24,6 +33,6 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, woqod-store-app');
+    expect(compiled.querySelector('h1')?.textContent).toContain('List of Raffle Transactions');
   });
 });
