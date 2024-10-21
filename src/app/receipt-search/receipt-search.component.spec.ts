@@ -7,6 +7,7 @@ import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { of } from 'rxjs';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('ReceiptSearchComponent', () => {
   let component: ReceiptSearchComponent;
@@ -26,7 +27,12 @@ describe('ReceiptSearchComponent', () => {
         ToastrModule.forRoot(),
       ],
       providers: [
-        { provide: InvoiceService, useValue: mockInvoiceService }, NgbModal, FormBuilder]
+        FormBuilder,
+        InvoiceService,
+        NgbModal,
+        { provide: ToastrService, useValue: jasmine.createSpyObj('ToastrService', ['error', 'success', 'warning']) }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
 
@@ -88,5 +94,29 @@ describe('ReceiptSearchComponent', () => {
     expect(component.searchForm.get('storeId')?.value).toBeNull();
     expect(component.filteredData.length).toBe(0);
     expect(component.hasSearched).toBeFalse();
+  });
+
+  it('should validate the date range and show error if "fromDate" is later than "toDate"', () => {
+    const toastrSpy = toastrService.error as jasmine.Spy;
+
+    component.searchForm.patchValue({
+      fromDate: '2024-08-21',
+      toDate: '2024-08-20'
+    });
+
+    component.validateDateRange();
+
+    expect(toastrSpy).toHaveBeenCalledWith('From Date cannot be later than To Date.', 'Invalid Date Range');
+  });
+
+  it('should trigger warnings if required fields are missing on search', () => {
+    component.searchForm.patchValue({
+      storeId: null,
+      receiptNo: ''
+    });
+    component.onRefresh();
+
+    expect(toastrService.warning).toHaveBeenCalledWith('Please select a Store ID.', 'Missing Input');
+    expect(toastrService.warning).toHaveBeenCalledWith('Please enter a Receipt Number.', 'Missing Input');
   });
 });
