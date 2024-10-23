@@ -18,6 +18,8 @@ export class InvoiceModalComponent {
   @Input() invoiceForm!: FormGroup;
   @Input() showPassport!: boolean;
   @Input() showQid!: boolean;
+  @Input() receiptNo!: string;
+  @Input() invoiceDate!:string;
   @Output() close = new EventEmitter<void>();
   @Output() updateInvoice = new EventEmitter<void>();
   @Output() onProofOfIdentityChange = new EventEmitter<void>();

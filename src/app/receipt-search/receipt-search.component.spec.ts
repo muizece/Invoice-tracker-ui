@@ -111,12 +111,10 @@ describe('ReceiptSearchComponent', () => {
 
   it('should trigger warnings if required fields are missing on search', () => {
     component.searchForm.patchValue({
-      storeId: null,
-      receiptNo: ''
+      storeId: null
     });
     component.onRefresh();
 
     expect(toastrService.warning).toHaveBeenCalledWith('Please select a Store ID.', 'Missing Input');
-    expect(toastrService.warning).toHaveBeenCalledWith('Please enter a Receipt Number.', 'Missing Input');
   });
 });

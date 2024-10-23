@@ -26,3 +26,12 @@
     border: 1px solid #e7eaec;
     color: white; /* Optional: to make text readable on a dark background */
   }
+
+  input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: white !important; /* Keep the background white */
+    cursor: not-allowed; /* Show the "not-allowed" cursor */
+    opacity: 1; /* Remove the grayed-out effect */
+    border: 1px solid #ccc; /* Optionally, add a border to match enabled fields */
+}

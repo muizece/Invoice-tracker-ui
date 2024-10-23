@@ -17,10 +17,9 @@
                 <td>{{ record.mobileNumber }}</td>
                 <td>
                     <button class="btn btn-sm btn-primary me-2">
-                        <i class="bi bi-eye"></i> View
+                        View
                     </button>
-
-                    <button class="btn btn-sm btn-warning" (click)="openModal.emit(record.id)">
+                    <button class="btn btn-sm btn-primary me-2" (click)="openModal.emit(record.id)">
                         Update
                     </button>
                 </td>

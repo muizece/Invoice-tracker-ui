@@ -1,0 +1,17 @@
+.modal-body {
+    padding: 2rem;
+    background-color: #f3f3f3;  
+    border-radius: 8px;  
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.modal-title{
+    color: #1ab394;
+}
+

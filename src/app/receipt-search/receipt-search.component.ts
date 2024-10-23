@@ -12,13 +12,20 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchFormComponent } from './search-form/search-form.component';
 import { InvoiceTableComponent } from './invoice-table/invoice-table.component';
 import { InvoiceModalComponent } from './invoice-modal/invoice-modal.component';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, debounceTime, of, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-receipt-search',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule, SearchFormComponent, InvoiceTableComponent, InvoiceModalComponent],
+  imports: [
+    ReactiveFormsModule,
+    CommonModule,
+    HttpClientModule,
+    SearchFormComponent,
+    InvoiceTableComponent,
+    InvoiceModalComponent,
+  ],
   templateUrl: './receipt-search.component.html',
   styleUrls: ['./receipt-search.component.scss'],
   providers: [InvoiceService],
@@ -32,11 +39,14 @@ export class ReceiptSearchComponent implements OnInit {
   showQid = false;
   filteredData: any[] = [];
   paginatedData: any[] = [];
+  originalData: any[] = [];
   currentPage = 1;
   itemsPerPage = 5;
   totalPages = 0;
   totalPagesArray: number[] = [];
   message: string = '';
+  receiptNo!: string;
+  invoiceDate!: string;
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
   constructor(
@@ -60,7 +70,7 @@ export class ReceiptSearchComponent implements OnInit {
 
     this.searchForm = this.fb.group({
       storeId: [null, Validators.required],
-      receiptNo: ['', Validators.required],
+      receiptNo: [''],
       fromDate: [today, Validators.required],
       toDate: [today, Validators.required],
     });
@@ -71,6 +81,15 @@ export class ReceiptSearchComponent implements OnInit {
     this.searchForm
       .get('toDate')
       ?.valueChanges.subscribe(() => this.validateDateRange());
+
+    this.searchForm
+      .get('receiptNo')
+      ?.valueChanges.pipe(debounceTime(300))
+      .subscribe(() => {
+        this.filterReceiptNo();
+      });
+
+    this.onRefresh();
   }
 
   validateDateRange(): void {
@@ -78,10 +97,30 @@ export class ReceiptSearchComponent implements OnInit {
     const toDate = this.searchForm.get('toDate')?.value;
 
     if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-      this.toastr.error('From Date cannot be later than To Date.', 'Invalid Date Range');
-} else {
-    this.searchForm.get('toDate')?.setErrors(null);  
-}
+      this.toastr.error(
+        'From Date cannot be later than To Date.',
+        'Invalid Date Range'
+      );
+    } else {
+      this.searchForm.get('toDate')?.setErrors(null);
+    }
+  }
+
+  filterReceiptNo(): void {
+    const searchTerm = this.searchForm.get('receiptNo')?.value;
+
+    if (searchTerm && searchTerm.trim() !== '') {
+      this.filteredData = this.originalData.filter((invoice) =>
+        invoice.receiptNo
+          .toString()
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+    } else {
+      this.filteredData = [...this.originalData];
+    }
+    this.calculateTotalPages();
+    this.paginateData();
   }
   onRefresh(): void {
     this.validateDateRange();
@@ -96,7 +135,8 @@ export class ReceiptSearchComponent implements OnInit {
             this.message = data.message;
             this.paginatedData = [];
           } else {
-            this.filteredData = data;
+            this.originalData = data;
+            this.filteredData = [...this.originalData];
             this.hasSearched = true;
             this.calculateTotalPages();
             this.paginateData();
@@ -110,11 +150,7 @@ export class ReceiptSearchComponent implements OnInit {
     } else {
       if (!this.searchForm.get('storeId')?.value) {
         this.toastr.warning('Please select a Store ID.', 'Missing Input');
-    }
-
-    if (!this.searchForm.get('receiptNo')?.value) {
-        this.toastr.warning('Please enter a Receipt Number.', 'Missing Input');
-    }
+      }
     }
   }
 
@@ -122,7 +158,7 @@ export class ReceiptSearchComponent implements OnInit {
     this.searchForm.reset();
     this.filteredData = [];
     this.hasSearched = false;
-    this.message='';
+    this.message = '';
     this.paginatedData = [];
     this.totalPages = 0;
     this.totalPagesArray = [];
@@ -131,7 +167,6 @@ export class ReceiptSearchComponent implements OnInit {
   onCloseModal() {
     this.modalService.dismissAll();
   }
-  
 
   openModal(id: number) {
     this.currentInvoiceId = id;
@@ -151,6 +186,9 @@ export class ReceiptSearchComponent implements OnInit {
         passport: invoice.passport || '',
       });
 
+      this.receiptNo = invoice.receiptNo;
+      this.invoiceDate = invoice.invoiceDate;
+
       this.setFieldState('customerName', invoice.customerName);
       this.setFieldState('email', invoice.email);
       this.setFieldState('mobileNumber', invoice.mobileNumber);
@@ -164,17 +202,17 @@ export class ReceiptSearchComponent implements OnInit {
 
   onProofOfIdentityChange(): void {
     const proofOfIdentity = this.invoiceForm.get('proofOfIdentity')?.value;
-    
+
     const isPassport = proofOfIdentity === 'passport';
     const isQid = proofOfIdentity === 'qid';
-    
+
     this.showPassport = isPassport;
     this.showQid = isQid;
-  
+
     this.toggleFormControl('passport', isPassport);
     this.toggleFormControl('qid', isQid);
   }
-  
+
   private toggleFormControl(controlName: string, condition: boolean): void {
     const control = this.invoiceForm.controls[controlName];
     if (condition && !control.value) {
@@ -207,25 +245,24 @@ export class ReceiptSearchComponent implements OnInit {
       customerName: formValues.customerName || '',
       qid: formValues.qid !== '' ? formValues.qid : 0,
     };
- 
+
     this.invoiceService
       .updateInvoice(this.currentInvoiceId, updatedInvoice)
       .pipe(
         tap((response) => {
           console.log('Invoice updated successfully', response);
-          this.toastr.success('Invoice updated successfully!','Success'); 
+          this.toastr.success('Invoice updated successfully!', 'Success');
           this.modalService.dismissAll();
           this.onRefresh();
         }),
         catchError((error) => {
           console.error('Error updating invoice', error);
-          this.toastr.error('Failed to update invoice. Please try again.'); 
-          return of(null); 
+          this.toastr.error('Failed to update invoice. Please try again.');
+          return of(null);
         })
       )
-      .subscribe(); 
+      .subscribe();
   }
-
 
   calculateTotalPages(): void {
     this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
@@ -259,4 +296,3 @@ export class ReceiptSearchComponent implements OnInit {
     this.paginateData();
   }
 }
-
