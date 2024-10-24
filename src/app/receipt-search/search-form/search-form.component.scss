@@ -1,42 +1,48 @@
 .container {
-    margin: 20px; 
+    margin: 20px;
 }
 
 .header {
     text-align: center;
-    font-size: 24px; 
-    margin-bottom: 10px; 
+    font-size: 24px;
+    margin-bottom: 10px;
 }
 
 .divider {
     border: none;
-    border-top: 2px solid #ccc; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-    margin: 0 auto; 
-    width: 50%; 
+    border-top: 2px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    width: 50%;
 }
 
 
 .form-select {
     height: 35px;
-    width : 400px;
-    border: 1px solid #ccc; 
+    width: 400px;
+    border: 1px solid #ccc;
 }
 
 .form-select:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .form-control[type="date"] {
     width: 125px;
-    height: 35px; 
-    padding: 10px; 
-    border: 1px solid #ccc; 
-    border-radius: 4px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-    transition: box-shadow 0.3s ease; 
+    height: 35px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
 }
 
 .form-control[type="date"]:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-disabled {
+    background-color: gray;
+    opacity: 0.75;
+    cursor: not-allowed;
 }

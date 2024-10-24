@@ -1,39 +1,41 @@
 <form [formGroup]="searchForm" (ngSubmit)="refresh.emit()">
-<div class="container">
-    <h1 class="header">List of Raffle Transactions</h1>
+    <div class="container">
+        <h1 class="header">List of Raffle Transactions</h1>
         <hr class="divider">
-    <div class="row align-items-end">
-        <div class="mb-3">
+        <div class="row align-items-end">
+            <div class="mb-3">
+                <div class="col-md-3 mb-3">
+                    <label for="storeId" class="form-label">Select Store</label>
+                    <select formControlName="storeId" id="storeId" class="form-select">
+                        <option value="" disabled>Select a store</option>
+                        <option *ngFor="let store of stores" [value]="store.id">{{ store.name }}</option>
+                    </select>
+                </div>
+            </div>
             <div class="col-md-3 mb-3">
-                <label for="storeId" class="form-label">Select Store</label>
-                <select formControlName="storeId" id="storeId" class="form-select">
-                    <option value="" disabled>Select a store</option>
-                    <option *ngFor="let store of stores" [value]="store.id">{{ store.name }}</option>
-                </select>
+                <label for="receiptNo" class="form-label">Receipt Number</label>
+                <input type="text" formControlName="receiptNo" id="receiptNo" class="form-control"
+                    placeholder="Enter receipt number" />
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="fromDate" class="form-label">From Date</label>
+                <input type="date" formControlName="fromDate" id="fromDate" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+                <label for="toDate" class="form-label">To Date</label>
+                <input type="date" formControlName="toDate" id="toDate" class="form-control" />
+            </div>
+            <div class="col-md-2 mb-3">
+                <button type="submit" class="btn btn-primary w-100" [disabled]="searchForm.invalid"
+                    [ngClass]="{'btn-disabled': searchForm.invalid}">
+                    Refresh
+                </button>
+            </div>
+            <div class="col-md-2 mb-3">
+                <button type="button" class="btn btn-secondary w-100" (click)="clear.emit()">
+                    Clear
+                </button>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <label for="receiptNo" class="form-label">Receipt Number</label>
-            <input type="text" formControlName="receiptNo" id="receiptNo" class="form-control"
-                placeholder="Enter receipt number" />
-        </div>
-        <div class="col-md-2 mb-3">
-            <label for="fromDate" class="form-label">From Date</label>
-            <input type="date" formControlName="fromDate" id="fromDate" class="form-control" />
-        </div>
-        <div class="col-md-2 mb-3">
-            <label for="toDate" class="form-label">To Date</label>
-            <input type="date" formControlName="toDate" id="toDate" class="form-control" />
-        </div>
-        <div class="col-md-2 mb-3">
-            <button type="submit" class="btn btn-primary w-100" 
-            [disabled]="searchForm.invalid" >Refresh</button>
-        </div>
-        <div class="col-md-2 mb-3">
-            <button type="button" class="btn btn-secondary w-100" (click)="clear.emit()">
-                Clear
-            </button>
-        </div>
-    </div>
     </div>
 </form>

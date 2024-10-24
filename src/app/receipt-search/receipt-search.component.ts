@@ -98,10 +98,8 @@ export class ReceiptSearchComponent implements OnInit {
     const toDate = this.searchForm.get('toDate')?.value;
 
     if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-      this.toastr.error(
-        'From Date cannot be later than To Date.',
-        'Invalid Date Range'
-      );
+      this.searchForm.get('toDate')?.setErrors({ invalidDateRange: true });
+      console.warn('From Date cannot be later than To Date.');
     } else {
       this.searchForm.get('toDate')?.setErrors(null);
     }
