@@ -18,6 +18,7 @@ export class InvoiceTableComponent {
   @Input() currentPage = 1;
   @Input() message = '';
   @Input() hasSearched = false;
+  @Input() totalRecords!:number;
   @Output() openModal = new EventEmitter<number>();
   @Output() previousPage = new EventEmitter<void>();
   @Output() goToPage = new EventEmitter<number>();

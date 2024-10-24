@@ -1,5 +1,5 @@
 <div class="mt-4">
-    <table *ngIf="paginatedData.length > 0" class="table table-striped table-bordered">
+    <table *ngIf="filteredData.length > 0" class="table table-striped table-bordered">
         <thead>
             <tr>
                 <th class="table-header">Receipt No.</th>
@@ -10,7 +10,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let record of paginatedData">
+            <tr *ngFor="let record of filteredData">
                 <td>{{ record.receiptNo }}</td>
                 <td>{{ record.totalAmount }}</td>
                 <td>{{ record.invoiceDate }}</td>
@@ -32,7 +32,7 @@
     </p>
 
     <!-- Pagination Controls -->
-    <nav *ngIf="filteredData.length > itemsPerPage">
+    <nav *ngIf="totalRecords > itemsPerPage">
         <ul class="pagination justify-content-center">
             <li class="page-item" [class.disabled]="currentPage === 1">
                 <a class="page-link" href="#" (click)="previousPage.emit()">Previous</a>

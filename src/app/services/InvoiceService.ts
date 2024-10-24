@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
-// import { environment } from './environments/environment';
+
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,7 @@ export class InvoiceService {
       .set('fromDate', searchParams.fromDate || '')
       .set('toDate', searchParams.toDate || '')
       .set('pageNumber', searchParams.pageNumber ? searchParams.pageNumber.toString() : '1') 
-      .set('pageSize', searchParams.pageSize ? searchParams.pageSize.toString() : '100'); 
+      .set('pageSize', searchParams.pageSize ? searchParams.pageSize.toString() : '10'); 
 
     return this.http.get(this.apiUrl, { params });
   }

@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="refresh.emit()">
+<form [formGroup]="searchForm" (ngSubmit)="refresh.emit()">
 <div class="container">
     <h1 class="header">List of Raffle Transactions</h1>
         <hr class="divider">
@@ -26,7 +26,8 @@
             <input type="date" formControlName="toDate" id="toDate" class="form-control" />
         </div>
         <div class="col-md-2 mb-3">
-            <button type="submit" class="btn btn-primary w-100">Refresh</button>
+            <button type="submit" class="btn btn-primary w-100" 
+            [disabled]="searchForm.invalid" >Refresh</button>
         </div>
         <div class="col-md-2 mb-3">
             <button type="button" class="btn btn-secondary w-100" (click)="clear.emit()">

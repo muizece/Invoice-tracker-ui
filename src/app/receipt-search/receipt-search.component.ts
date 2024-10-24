@@ -41,12 +41,13 @@ export class ReceiptSearchComponent implements OnInit {
   paginatedData: any[] = [];
   originalData: any[] = [];
   currentPage = 1;
-  itemsPerPage = 5;
+  itemsPerPage = 10;
   totalPages = 0;
   totalPagesArray: number[] = [];
   message: string = '';
   receiptNo!: string;
   invoiceDate!: string;
+  totalRecords!:number;
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
   constructor(
@@ -120,13 +121,13 @@ export class ReceiptSearchComponent implements OnInit {
       this.filteredData = [...this.originalData];
     }
     this.calculateTotalPages();
-    this.paginateData();
   }
   onRefresh(): void {
     this.validateDateRange();
     if (this.searchForm.valid) {
       const formData = this.searchForm.value;
-
+      formData.pageNumber = this.currentPage; 
+      formData.pageSize = this.itemsPerPage;
       this.invoiceService.getInvoiceDetails(formData).subscribe(
         (data) => {
           if (data.message && data.data.length === 0) {
@@ -135,11 +136,11 @@ export class ReceiptSearchComponent implements OnInit {
             this.message = data.message;
             this.paginatedData = [];
           } else {
-            this.originalData = data;
+            this.originalData = data.data;
             this.filteredData = [...this.originalData];
+            this.totalRecords=data.totalCount;
             this.hasSearched = true;
             this.calculateTotalPages();
-            this.paginateData();
             this.message = '';
           }
         },
@@ -217,16 +218,35 @@ export class ReceiptSearchComponent implements OnInit {
     const control = this.invoiceForm.controls[controlName];
     if (condition && !control.value) {
       control.enable();
+      if (controlName === 'passport') {
+        control.setValidators([Validators.required, Validators.minLength(8)]); // Example validation for passport
+      } else if (controlName === 'qid') {
+        control.setValidators([Validators.required, Validators.minLength(6)]); // Example validation for QID
+      }
+      control.updateValueAndValidity();
     } else {
       control.disable();
     }
   }
 
   setFieldState(fieldName: string, value: any) {
+    const control = this.invoiceForm.controls[fieldName];
     if (value) {
       this.invoiceForm.controls[fieldName].disable();
     } else {
       this.invoiceForm.controls[fieldName].enable();
+
+      if (fieldName === 'customerName') {
+        control.setValidators([Validators.required, Validators.minLength(2)]);
+      } else if (fieldName === 'email') {
+        control.setValidators([Validators.required, Validators.email]);
+      } else if (fieldName === 'mobileNumber') {
+        control.setValidators([
+          Validators.required,
+          Validators.pattern('^[0-9]{10}$') // 10-digit mobile number validation
+        ]);
+      }
+      control.updateValueAndValidity();
     }
   }
 
@@ -265,34 +285,28 @@ export class ReceiptSearchComponent implements OnInit {
   }
 
   calculateTotalPages(): void {
-    this.totalPages = Math.ceil(this.filteredData.length / this.itemsPerPage);
+    this.totalPages = Math.ceil(this.totalRecords / this.itemsPerPage);
     this.totalPagesArray = Array(this.totalPages)
       .fill(0)
       .map((x, i) => i + 1);
   }
 
-  paginateData(): void {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedData = this.filteredData.slice(startIndex, endIndex);
-  }
-
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.paginateData();
+      this.onRefresh();
     }
   }
 
   previousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.paginateData();
+      this.onRefresh();
     }
   }
 
   goToPage(page: number): void {
     this.currentPage = page;
-    this.paginateData();
+    this.onRefresh();
   }
 }

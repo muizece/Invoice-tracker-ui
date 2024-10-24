@@ -2,7 +2,7 @@
   <div class="card p-4 shadow">
     <!-- Store selection and search form combined -->
     <app-search-form
-      [form]="searchForm"
+      [searchForm]="searchForm"
       (refresh)="onRefresh()"
       (clear)="onClear()"
     ></app-search-form>
@@ -16,6 +16,7 @@
       [currentPage]="currentPage"
       [hasSearched]="hasSearched"
       [message]="message"
+      [totalRecords]="totalRecords"
       
       (openModal)="openModal($event)"
       (previousPage)="previousPage()"

@@ -10,7 +10,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
   styleUrl: './search-form.component.scss',
 })
 export class SearchFormComponent {
-  @Input() form!: FormGroup;
+  @Input() searchForm!: FormGroup;
   @Output() refresh = new EventEmitter<void>();
   @Output() clear = new EventEmitter<void>();
 

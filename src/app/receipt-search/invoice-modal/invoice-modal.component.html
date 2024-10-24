@@ -9,18 +9,29 @@
         <div class="mb-3">
             <label for="customerName" class="form-label">Customer Name</label>
             <input type="text" id="customerName" class="form-control" formControlName="customerName" />
+            <div *ngIf="invoiceForm.get('customerName')?.invalid && invoiceForm.get('customerName')?.touched" class="text-danger">
+                Customer Name is required.
+              </div>
         </div>
 
         <!-- Email -->
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" id="email" class="form-control" formControlName="email" />
+            <div *ngIf="invoiceForm.get('email')?.invalid && invoiceForm.get('email')?.touched" class="text-danger">
+                <span *ngIf="invoiceForm.get('email')?.errors?.['required']">Email is required.</span>
+                <span *ngIf="invoiceForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
+              </div>
         </div>
 
         <!-- Mobile -->
         <div class="mb-3">
             <label for="mobileNumber" class="form-label">Mobile Number</label>
             <input type="tel" id="mobileNumber" class="form-control" formControlName="mobileNumber" />
+            <div *ngIf="invoiceForm.get('mobileNumber')?.invalid && invoiceForm.get('mobileNumber')?.touched" class="text-danger">
+                <span *ngIf="invoiceForm.get('mobileNumber')?.errors?.['required']">Mobile number is required.</span>
+                <span *ngIf="invoiceForm.get('mobileNumber')?.errors?.['pattern']">Enter a valid 10-digit mobile number.</span>
+              </div>
         </div>
 
         <!-- Proof of Identity -->
