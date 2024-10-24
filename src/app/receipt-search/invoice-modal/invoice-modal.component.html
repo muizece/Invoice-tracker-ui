@@ -49,11 +49,17 @@
             <label for="passport" class="form-label">Passport</label>
             <input type="text" id="passport" class="form-control" formControlName="passport"
                 [disabled]="!showPassport" />
+                <div *ngIf="invoiceForm.get('passport')?.invalid && invoiceForm.get('passport')?.touched" class="text-danger">
+                    <span *ngIf="invoiceForm.get('passport')?.errors?.['required']">Passport is required.</span>
+                </div>
         </div>
 
         <div *ngIf="showQid" class="mb-3">
             <label for="qid" class="form-label">QID</label>
             <input type="number" id="qid" class="form-control" formControlName="qid" [disabled]="!showQid" />
+            <div *ngIf="invoiceForm.get('qid')?.invalid && invoiceForm.get('qid')?.touched" class="text-danger">
+                <span *ngIf="invoiceForm.get('qid')?.errors?.['required']">QID is required.</span>
+            </div>
         </div>
     </form>
 </div>

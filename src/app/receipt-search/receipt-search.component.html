@@ -10,13 +10,13 @@
   <div class="mt-4">
     <app-invoice-table
       [filteredData]="filteredData"
-      [paginatedData]="paginatedData"
       [totalPagesArray]="totalPagesArray"
       [itemsPerPage]="itemsPerPage"
       [currentPage]="currentPage"
       [hasSearched]="hasSearched"
       [message]="message"
       [totalRecords]="totalRecords"
+      [searchForm]="searchForm"
       
       (openModal)="openModal($event)"
       (previousPage)="previousPage()"

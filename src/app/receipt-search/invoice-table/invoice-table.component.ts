@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-invoice-table',
@@ -11,7 +11,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 })
 export class InvoiceTableComponent {
   @Input() filteredData: any[] = [];
-  @Input() paginatedData: any[] = [];
   @Input() totalPagesArray: number[] = [];
   @Input() itemsPerPage = 5;
   @Input() totalPages = 0;
@@ -19,6 +18,7 @@ export class InvoiceTableComponent {
   @Input() message = '';
   @Input() hasSearched = false;
   @Input() totalRecords!:number;
+  @Input() searchForm!:FormGroup;
   @Output() openModal = new EventEmitter<number>();
   @Output() previousPage = new EventEmitter<void>();
   @Output() goToPage = new EventEmitter<number>();

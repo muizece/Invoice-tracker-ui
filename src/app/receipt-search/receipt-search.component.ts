@@ -38,7 +38,6 @@ export class ReceiptSearchComponent implements OnInit {
   showPassport = false;
   showQid = false;
   filteredData: any[] = [];
-  paginatedData: any[] = [];
   originalData: any[] = [];
   currentPage = 1;
   itemsPerPage = 10;
@@ -48,6 +47,7 @@ export class ReceiptSearchComponent implements OnInit {
   receiptNo!: string;
   invoiceDate!: string;
   totalRecords!:number;
+  isClearingForm = false;
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
   constructor(
@@ -82,30 +82,48 @@ export class ReceiptSearchComponent implements OnInit {
     this.searchForm
       .get('toDate')
       ?.valueChanges.subscribe(() => this.validateDateRange());
-
     this.searchForm
       .get('receiptNo')
       ?.valueChanges.pipe(debounceTime(300))
       .subscribe(() => {
         this.filterReceiptNo();
       });
-
-    this.onRefresh();
   }
 
+  
   validateDateRange(): void {
     const fromDate = this.searchForm.get('fromDate')?.value;
     const toDate = this.searchForm.get('toDate')?.value;
 
-    if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-      this.searchForm.get('toDate')?.setErrors({ invalidDateRange: true });
-      console.warn('From Date cannot be later than To Date.');
-    } else {
-      this.searchForm.get('toDate')?.setErrors(null);
+    this.searchForm.get('fromDate')?.setErrors(null);
+    this.searchForm.get('toDate')?.setErrors(null);
+    this.searchForm.setErrors(null); // Clear any previous form group errors
+
+    // Validate date conditions
+    if (!fromDate && !toDate) {
+        this.searchForm.setErrors({ invalidDateRange: true });
+        console.warn('Both From Date and To Date must be filled.');
+    } else if (fromDate && !toDate) {
+        this.searchForm.setErrors({ invalidDateRange: true });
+        console.warn('To Date must be filled if From Date is provided.');
+    } else if (!fromDate && toDate) {
+        this.searchForm.setErrors({ invalidDateRange: true });
+        console.warn('From Date must be filled if To Date is provided.');
+    } else if (new Date(fromDate) > new Date(toDate)) {
+        this.searchForm.get('toDate')?.setErrors({ invalidDateRange: true });
+        this.searchForm.setErrors({ invalidDateRange: true });
+        console.warn('From Date cannot be later than To Date.');
     }
-  }
+}
+
+
 
   filterReceiptNo(): void {
+  
+    if (this.isClearingForm) {
+      return;
+    }
+    this.isClearingForm=false;
     const searchTerm = this.searchForm.get('receiptNo')?.value;
 
     if (searchTerm && searchTerm.trim() !== '') {
@@ -118,7 +136,6 @@ export class ReceiptSearchComponent implements OnInit {
     } else {
       this.filteredData = [...this.originalData];
     }
-    this.calculateTotalPages();
   }
   onRefresh(): void {
     this.validateDateRange();
@@ -132,7 +149,6 @@ export class ReceiptSearchComponent implements OnInit {
             this.filteredData = [];
             this.hasSearched = true;
             this.message = data.message;
-            this.paginatedData = [];
           } else {
             this.originalData = data.data;
             this.filteredData = [...this.originalData];
@@ -154,13 +170,14 @@ export class ReceiptSearchComponent implements OnInit {
   }
 
   onClear() {
+    this.isClearingForm = true;
     this.searchForm.reset();
     this.filteredData = [];
     this.hasSearched = false;
     this.message = '';
-    this.paginatedData = [];
     this.totalPages = 0;
     this.totalPagesArray = [];
+    this.totalRecords=0;
   }
 
   onCloseModal() {
@@ -217,9 +234,9 @@ export class ReceiptSearchComponent implements OnInit {
     if (condition && !control.value) {
       control.enable();
       if (controlName === 'passport') {
-        control.setValidators([Validators.required, Validators.minLength(8)]); // Example validation for passport
+        control.setValidators([Validators.required]); 
       } else if (controlName === 'qid') {
-        control.setValidators([Validators.required, Validators.minLength(6)]); // Example validation for QID
+        control.setValidators([Validators.required]); 
       }
       control.updateValueAndValidity();
     } else {
