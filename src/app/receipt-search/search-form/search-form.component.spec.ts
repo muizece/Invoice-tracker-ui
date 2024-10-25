@@ -29,7 +29,7 @@ describe('SearchFormComponent', () => {
       toDate: [''],
     });
 
-    component.form = formGroup;
+    component.searchForm= formGroup;
     fixture.detectChanges();
   });
 

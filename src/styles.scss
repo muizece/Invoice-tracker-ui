@@ -27,7 +27,7 @@
     color: white; /* Optional: to make text readable on a dark background */
   }
 
-  input:disabled,
+input:disabled,
 select:disabled,
 textarea:disabled {
     background-color: white !important; /* Keep the background white */

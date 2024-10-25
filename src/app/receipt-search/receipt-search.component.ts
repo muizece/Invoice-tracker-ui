@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -14,6 +14,7 @@ import { InvoiceTableComponent } from './invoice-table/invoice-table.component';
 import { InvoiceModalComponent } from './invoice-modal/invoice-modal.component';
 import { catchError, debounceTime, of, tap } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerModule, NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-receipt-search',
@@ -25,6 +26,7 @@ import { ToastrService } from 'ngx-toastr';
     SearchFormComponent,
     InvoiceTableComponent,
     InvoiceModalComponent,
+    NgxSpinnerModule
   ],
   templateUrl: './receipt-search.component.html',
   styleUrls: ['./receipt-search.component.scss'],
@@ -50,6 +52,8 @@ export class ReceiptSearchComponent implements OnInit {
   isClearingForm = false;
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
+
+  private spinner = inject(NgxSpinnerService);
   constructor(
     private fb: FormBuilder,
     private invoiceService: InvoiceService,
@@ -145,6 +149,9 @@ export class ReceiptSearchComponent implements OnInit {
       formData.pageSize = this.itemsPerPage;
       this.invoiceService.getInvoiceDetails(formData).subscribe(
         (data) => {
+          this.spinner.show('ball-atom');
+          setTimeout(() => {
+            this.spinner.hide('ball-atom');
           if (data.message && data.data.length === 0) {
             this.filteredData = [];
             this.hasSearched = true;
@@ -157,6 +164,7 @@ export class ReceiptSearchComponent implements OnInit {
             this.calculateTotalPages();
             this.message = '';
           }
+        },2000);
         },
         (error) => {
           console.error('Error fetching invoices', error);

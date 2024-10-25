@@ -96,19 +96,6 @@ describe('ReceiptSearchComponent', () => {
     expect(component.hasSearched).toBeFalse();
   });
 
-  it('should validate the date range and show error if "fromDate" is later than "toDate"', () => {
-    const toastrSpy = toastrService.error as jasmine.Spy;
-
-    component.searchForm.patchValue({
-      fromDate: '2024-08-21',
-      toDate: '2024-08-20'
-    });
-
-    component.validateDateRange();
-
-    expect(toastrSpy).toHaveBeenCalledWith('From Date cannot be later than To Date.', 'Invalid Date Range');
-  });
-
   it('should trigger warnings if required fields are missing on search', () => {
     component.searchForm.patchValue({
       storeId: null

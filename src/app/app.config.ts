@@ -1,8 +1,10 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideToastr } from 'ngx-toastr';
+import { provideSpinnerConfig } from 'ngx-spinner';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,5 +16,9 @@ export const appConfig: ApplicationConfig = {
       timeOut: 3000,
       preventDuplicates:true,
     }),
+    provideSpinnerConfig({
+      type:'ball-atom'
+    }),
+    importProvidersFrom([BrowserAnimationsModule])
   ],
 };
