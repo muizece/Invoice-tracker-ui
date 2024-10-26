@@ -23,4 +23,9 @@ export class InvoiceTableComponent {
   @Output() previousPage = new EventEmitter<void>();
   @Output() goToPage = new EventEmitter<number>();
   @Output() nextPage = new EventEmitter<void>();
+  @Output() openViewModal = new EventEmitter<any>();
+
+viewRecord(record: any): void {
+  this.openViewModal.emit(record);
+}
 }

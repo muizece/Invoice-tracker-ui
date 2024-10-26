@@ -42,7 +42,7 @@ export class ReceiptSearchComponent implements OnInit {
   filteredData: any[] = [];
   originalData: any[] = [];
   currentPage = 1;
-  itemsPerPage = 10;
+  itemsPerPage = 5;
   totalPages = 0;
   totalPagesArray: number[] = [];
   message: string = '';
@@ -50,15 +50,18 @@ export class ReceiptSearchComponent implements OnInit {
   invoiceDate!: string;
   totalRecords!:number;
   isClearingForm = false;
+  selectedRecord: any;
+
 
   @ViewChild('invoiceModal') invoiceModal!: TemplateRef<any>;
+  @ViewChild('viewModal') viewModal!: TemplateRef<any>;
 
   private spinner = inject(NgxSpinnerService);
   constructor(
     private fb: FormBuilder,
     private invoiceService: InvoiceService,
     private toastr: ToastrService,
-    private modalService: NgbModal
+    public modalService: NgbModal
   ) {
     this.invoiceForm = this.fb.group({
       customerName: [''],
@@ -190,6 +193,11 @@ export class ReceiptSearchComponent implements OnInit {
     this.totalPages = 0;
     this.totalPagesArray = [];
     this.totalRecords=0;
+  }
+
+  openViewModal(record: any): void {
+    this.selectedRecord = record;
+    this.modalService.open(this.viewModal, { centered: true });
   }
 
   onCloseModal() {

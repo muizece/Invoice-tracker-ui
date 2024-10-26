@@ -20,6 +20,7 @@
       [searchForm]="searchForm"
       
       (openModal)="openModal($event)"
+      (openViewModal)="openViewModal($event)"
       (previousPage)="previousPage()"
       (goToPage)="goToPage($event)"
       (nextPage)="nextPage()"
@@ -40,4 +41,53 @@
       (onProofOfIdentityChange)="onProofOfIdentityChange()"
     ></app-invoice-modal>
   </ng-template>
+
+  <!-- View Modal -->
+<ng-template #viewModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">View Invoice Details</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalService.dismissAll()"></button>
+  </div>
+  <div class="modal-body">
+    <table class="table table-bordered">
+      <tbody>
+        <tr>
+          <th>Receipt No.</th>
+          <td>{{ selectedRecord?.receiptNo }}</td>
+        </tr>
+        <tr>
+          <th>Total Amount</th>
+          <td>{{ selectedRecord?.totalAmount }}</td>
+        </tr>
+        <tr>
+          <th>Invoice Date</th>
+          <td>{{ selectedRecord?.invoiceDate }}</td>
+        </tr>
+        <tr>
+          <th>Mobile Number</th>
+          <td>{{ selectedRecord?.mobileNumber }}</td>
+        </tr>
+        <tr>
+          <th>Email id </th>
+          <td>{{ selectedRecord?.email }}</td>
+        </tr>
+        <tr>
+          <th>Customer Name</th>
+          <td>{{ selectedRecord?.customerName }}</td>
+        </tr>
+        <tr>
+          <th>QID</th>
+          <td>{{ selectedRecord?.qid }}</td>
+        </tr>
+        <tr>
+          <th>Passport</th>
+          <td>{{ selectedRecord?.passport }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modalService.dismissAll()">Close</button>
+  </div>
+</ng-template>
 </div>
