@@ -106,16 +106,20 @@ export class ReceiptSearchComponent implements OnInit {
     // Validate date conditions
     if (!fromDate && !toDate) {
         this.searchForm.setErrors({ invalidDateRange: true });
+        this.toastr.error("Both From Date and To Date must be filled.");
         console.warn('Both From Date and To Date must be filled.');
     } else if (fromDate && !toDate) {
         this.searchForm.setErrors({ invalidDateRange: true });
+        this.toastr.error("To Date must be filled if From Date is provided.");
         console.warn('To Date must be filled if From Date is provided.');
     } else if (!fromDate && toDate) {
         this.searchForm.setErrors({ invalidDateRange: true });
+        this.toastr.error("From Date must be filled if To Date is provided.");
         console.warn('From Date must be filled if To Date is provided.');
     } else if (new Date(fromDate) > new Date(toDate)) {
         this.searchForm.get('toDate')?.setErrors({ invalidDateRange: true });
         this.searchForm.setErrors({ invalidDateRange: true });
+        this.toastr.error("From Date cannot be later than To Date.");
         console.warn('From Date cannot be later than To Date.');
     }
 }
