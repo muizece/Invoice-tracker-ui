@@ -12,7 +12,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 export class InvoiceTableComponent {
   @Input() filteredData: any[] = [];
   @Input() totalPagesArray: number[] = [];
-  @Input() itemsPerPage = 5;
+  @Input() itemsPerPage = 10;
   @Input() totalPages = 0;
   @Input() currentPage = 1;
   @Input() message = '';

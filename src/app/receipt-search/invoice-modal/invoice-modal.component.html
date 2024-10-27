@@ -30,7 +30,7 @@
             <input type="tel" id="mobileNumber" class="form-control" formControlName="mobileNumber" />
             <div *ngIf="invoiceForm.get('mobileNumber')?.invalid && invoiceForm.get('mobileNumber')?.touched" class="text-danger">
                 <span *ngIf="invoiceForm.get('mobileNumber')?.errors?.['required']">Mobile number is required.</span>
-                <span *ngIf="invoiceForm.get('mobileNumber')?.errors?.['pattern']">Enter a valid 10-digit mobile number.</span>
+                <span *ngIf="invoiceForm.get('mobileNumber')?.errors?.['pattern']">Please enter a valid 8-digit number starting with 3, 5, 6, or 7</span>
               </div>
         </div>
 
@@ -59,6 +59,7 @@
             <input type="number" id="qid" class="form-control" formControlName="qid" [disabled]="!showQid" />
             <div *ngIf="invoiceForm.get('qid')?.invalid && invoiceForm.get('qid')?.touched" class="text-danger">
                 <span *ngIf="invoiceForm.get('qid')?.errors?.['required']">QID is required.</span>
+                <span *ngIf="invoiceForm.get('qid')?.errors?.['pattern']">Please enter a valid 11-digit QID number starting with 2 or 3.</span>
             </div>
         </div>
     </form>

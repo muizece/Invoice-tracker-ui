@@ -61,7 +61,7 @@
         </tr>
         <tr>
           <th>Invoice Date</th>
-          <td>{{ selectedRecord?.invoiceDate }}</td>
+          <td>{{ selectedRecord?.invoiceDate | date: "dd/MM/yyyy hh:mm a"  }}</td>
         </tr>
         <tr>
           <th>Mobile Number</th>

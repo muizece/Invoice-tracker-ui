@@ -42,7 +42,7 @@ export class ReceiptSearchComponent implements OnInit {
   filteredData: any[] = [];
   originalData: any[] = [];
   currentPage = 1;
-  itemsPerPage = 5;
+  itemsPerPage = 10;
   totalPages = 0;
   totalPagesArray: number[] = [];
   message: string = '';
@@ -256,7 +256,12 @@ export class ReceiptSearchComponent implements OnInit {
       if (controlName === 'passport') {
         control.setValidators([Validators.required]); 
       } else if (controlName === 'qid') {
-        control.setValidators([Validators.required]); 
+        control.setValidators([Validators.required,
+          Validators.minLength(11), 
+          Validators.maxLength(11),
+          Validators.pattern(/^[23][0-9]{10}$/)
+
+        ]); 
       }
       control.updateValueAndValidity();
     } else {
@@ -278,7 +283,7 @@ export class ReceiptSearchComponent implements OnInit {
       } else if (fieldName === 'mobileNumber') {
         control.setValidators([
           Validators.required,
-          Validators.pattern('^[0-9]{10}$') // 10-digit mobile number validation
+          Validators.pattern(/^[3567]\d{7}$/)
         ]);
       }
       control.updateValueAndValidity();

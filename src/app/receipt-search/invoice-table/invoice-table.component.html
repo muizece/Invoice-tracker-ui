@@ -13,7 +13,7 @@
             <tr *ngFor="let record of filteredData">
                 <td>{{ record.receiptNo }}</td>
                 <td>{{ record.totalAmount }}</td>
-                <td>{{ record.invoiceDate }}</td>
+                <td>{{ record.invoiceDate | date: "dd/MM/yyyy hh:mm a" }}</td>
                 <td>{{ record.mobileNumber }}</td>
                 <td>
                     <button class="btn btn-sm btn-primary me-2" (click)="viewRecord(record)">
