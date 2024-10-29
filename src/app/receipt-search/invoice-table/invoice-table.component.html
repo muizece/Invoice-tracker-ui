@@ -17,12 +17,17 @@
                 <td>{{ record.mobileNumber }}</td>
                 <td>
                     <button class="btn btn-sm btn-primary me-2" (click)="viewRecord(record)">
-                        <i class="fas fa-eye"></i>  View
+                      <i class="fas fa-eye"></i> View
                     </button>
-                    <button class="btn btn-sm btn-primary me-2" (click)="openModal.emit(record.id)">
-                        <i class="fas fa-edit"></i> Update
+                  
+                    <button
+                      class="btn btn-sm btn-primary me-2"
+                      (click)="openModal.emit(record.id)"
+                    >
+                      <i class="fas fa-edit"></i>
+                      {{ getButtonLabel(record) }}
                     </button>
-                </td>
+                  </td>
             </tr>
         </tbody>
     </table>

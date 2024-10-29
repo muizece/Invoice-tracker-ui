@@ -28,4 +28,10 @@ export class InvoiceTableComponent {
 viewRecord(record: any): void {
   this.openViewModal.emit(record);
 }
+
+getButtonLabel(record: any): string {
+  return record.mobileNumber ? 'Invoice' : 'Update';
+}
+
+
 }
